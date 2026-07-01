@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#071a17" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="אמא אמרה 700" />
+  <title>אמא אמרה 700</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icon-512.png" />
+  <link rel="icon" type="image/png" href="icon-192.png" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">מסגרת חודשית</p>
+        <h1>אמא אמרה 700</h1>
+      </div>
+      <button class="icon-btn" id="settingsBtn" aria-label="הגדרות">⚙︎</button>
+    </header>
+
+    <main>
+      <section class="hero-card">
+        <div class="hero-glow"></div>
+        <div class="budget-circle" aria-label="אחוז ניצול">
+          <svg viewBox="0 0 120 120" role="img" aria-hidden="true">
+            <circle class="circle-bg" cx="60" cy="60" r="51"></circle>
+            <circle class="circle-progress" id="progressCircle" cx="60" cy="60" r="51"></circle>
+          </svg>
+          <div class="circle-content">
+            <span class="small-label">נשאר לך</span>
+            <strong id="remainingAmount">₪700</strong>
+            <span id="usedPercent">0% נוצל</span>
+          </div>
+        </div>
+
+        <div class="hero-stats">
+          <div class="stat-pill"><span>נוצל</span><strong id="spentAmount">₪0</strong></div>
+          <div class="stat-pill"><span>תקציב</span><strong id="budgetAmount">₪700</strong></div>
+          <div class="stat-pill"><span>עד האיפוס</span><strong id="daysLeft">—</strong></div>
+        </div>
+
+        <p class="budget-message" id="budgetMessage">אמא יכולה לנשום. בינתיים.</p>
+        <button class="primary-btn" id="addExpenseBtn">הוצאתי</button>
+      </section>
+
+      <nav class="tabs" aria-label="ניווט">
+        <button class="tab active" data-tab="home">בית</button>
+        <button class="tab" data-tab="history">היסטוריה</button>
+        <button class="tab" data-tab="stats">סטטיסטיקות</button>
+      </nav>
+
+      <section class="tab-panel active" id="homePanel">
+        <div class="section-head"><h2>הוצאות אחרונות</h2><span id="monthLabel"></span></div>
+        <div class="expenses-list" id="expensesList"></div>
+      </section>
+
+      <section class="tab-panel" id="historyPanel">
+        <div class="section-head"><h2>היסטוריה</h2><span>לפי חודשים</span></div>
+        <div class="history-list" id="historyList"></div>
+      </section>
+
+      <section class="tab-panel" id="statsPanel">
+        <div class="section-head"><h2>סטטיסטיקות</h2><span>בלי שיפוטיות. כמעט.</span></div>
+        <div class="stats-grid">
+          <article class="info-card"><span>ממוצע חודשי</span><strong id="monthlyAverage">₪0</strong></article>
+          <article class="info-card"><span>החודש הנוכחי</span><strong id="currentMonthTotal">₪0</strong></article>
+          <article class="info-card wide"><span>מצב רוח תקציבי</span><strong id="budgetMood">רגוע כמו אמא אחרי קפה</strong></article>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="sheet-backdrop" id="expenseModal" hidden>
+    <form class="bottom-sheet" id="expenseForm">
+      <div class="sheet-handle"></div>
+      <div class="sheet-head">
+        <h2 id="expenseFormTitle">הוצאה חדשה</h2>
+        <button type="button" class="icon-btn ghost" data-close="expenseModal" aria-label="סגירה">×</button>
+      </div>
+      <input type="hidden" id="expenseId" />
+      <label>סכום<input id="expenseAmount" inputmode="decimal" type="number" min="0" step="0.01" placeholder="כמה הלך?" required /></label>
+      <label>תיאור<input id="expenseDesc" type="text" placeholder="על מה הפעם?" maxlength="50" required /></label>
+      <label>תאריך<input id="expenseDate" type="date" required /></label>
+      <div class="warning-box" id="overBudgetWarning" hidden><strong>זה כבר מעבר ל־700, גברת</strong><span>אפשר לשמור בכל זאת, אבל אמא ביקשה יפה.</span></div>
+      <button class="primary-btn" type="submit">שמרי</button>
+    </form>
+  </div>
+
+  <div class="sheet-backdrop" id="settingsModal" hidden>
+    <form class="bottom-sheet small" id="settingsForm">
+      <div class="sheet-handle"></div>
+      <div class="sheet-head">
+        <h2>הגדרות</h2>
+        <button type="button" class="icon-btn ghost" data-close="settingsModal" aria-label="סגירה">×</button>
+      </div>
+      <label>תקציב חודשי<input id="settingsBudget" inputmode="decimal" type="number" min="1" step="1" required /></label>
+      <p class="helper-text">ברירת המחדל היא 700 ₪, אבל החיים קורים.</p>
+      <button class="primary-btn" type="submit">עדכני תקציב</button>
+    </form>
+  </div>
+
+  <div class="confirm-pop" id="confirmPop" hidden>
+    <div class="confirm-card">
+      <h3>בטוחה שאת רוצה למחוק?</h3>
+      <p>הוצאה שנמחקת לא חוזרת, כמו כסף בסופר פארם.</p>
+      <div class="confirm-actions">
+        <button class="secondary-btn" id="cancelDelete" type="button">לא למחוק</button>
+        <button class="danger-btn" id="confirmDelete" type="button">כן, למחוק</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
