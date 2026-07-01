@@ -133,12 +133,12 @@ h1 {
 .small-label,
 .circle-content span:last-child {
   color: var(--muted);
-  font-size: .95rem;
+  font-size: .88rem;
 }
 .circle-content strong {
-  font-size: clamp(3rem, 18vw, 5.5rem);
-  line-height: .95;
-  letter-spacing: -0.07em;
+  font-size: clamp(2.35rem, 14vw, 4.25rem);
+  line-height: 1;
+  letter-spacing: -0.05em;
 }
 .hero-stats {
   display: grid;
