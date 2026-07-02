@@ -459,3 +459,23 @@ input:focus {
   input { min-height: 50px; padding-block: 12px; }
   .warning-box { padding: 11px 13px; }
 }
+
+.version-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: rgba(214, 187, 129, 0.14);
+  border: 1px solid rgba(214, 187, 129, 0.24);
+  color: #e9d8a6;
+  font-size: 11px;
+  white-space: nowrap;
+}
+.backup-section {
+  margin-top: 14px;
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.055);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.backup-section .helper-text { margin-top: 4px; }
