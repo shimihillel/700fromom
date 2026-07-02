@@ -35,7 +35,10 @@ const els = {
   settingsBudget: document.querySelector('#settingsBudget'),
   confirmPop: document.querySelector('#confirmPop'),
   cancelDelete: document.querySelector('#cancelDelete'),
-  confirmDelete: document.querySelector('#confirmDelete')
+  confirmDelete: document.querySelector('#confirmDelete'),
+  backupBtn: document.querySelector('#backupBtn'),
+  restoreBtn: document.querySelector('#restoreBtn'),
+  restoreFile: document.querySelector('#restoreFile')
 };
 
 let state = loadState();
@@ -70,6 +73,9 @@ function bindEvents() {
   els.expenseForm.addEventListener('submit', handleExpenseSubmit);
   els.settingsForm.addEventListener('submit', handleSettingsSubmit);
   els.expenseAmount.addEventListener('input', updateOverBudgetWarning);
+  els.backupBtn.addEventListener('click', backupData);
+  els.restoreBtn.addEventListener('click', () => els.restoreFile.click());
+  els.restoreFile.addEventListener('change', handleRestoreFile);
 
   els.cancelDelete.addEventListener('click', () => {
     pendingDeleteId = null;
@@ -314,6 +320,111 @@ function handleSettingsSubmit(event) {
   saveState();
   els.settingsModal.hidden = true;
   render();
+}
+
+
+function backupData() {
+  const backup = {
+    app: 'אמא אמרה 700',
+    version: 5,
+    exportedAt: new Date().toISOString(),
+    data: state
+  };
+  const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  const today = toDateInputValue(new Date());
+  link.href = url;
+  link.download = `mama-amra-700-backup-${today}.json`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
+function handleRestoreFile(event) {
+  const file = event.target.files?.[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const parsed = JSON.parse(String(reader.result || '{}'));
+      const restored = normalizeImportedState(parsed);
+      if (!restored) throw new Error('Invalid backup');
+
+      const ok = confirm('לשחזר את הגיבוי? זה יחליף את הנתונים הנוכחיים באפליקציה.');
+      if (!ok) return;
+
+      state = restored;
+      rolloverIfNeeded();
+      saveState();
+      els.settingsModal.hidden = true;
+      render();
+      alert('שוחזר בהצלחה. אמא יכולה להמשיך לנשום.');
+    } catch (error) {
+      alert('לא הצלחתי לשחזר את הקובץ הזה. הוא נראה לי לא הגיבוי הנכון.');
+    } finally {
+      els.restoreFile.value = '';
+    }
+  };
+  reader.readAsText(file);
+}
+
+function normalizeImportedState(imported) {
+  const data = imported?.data || imported;
+  if (!data || typeof data !== 'object') return null;
+
+  const budget = Number(data.budget);
+  const monthKey = typeof data.monthKey === 'string' && /^\d{4}-\d{2}$/.test(data.monthKey)
+    ? data.monthKey
+    : getMonthKey(new Date());
+
+  if (!budget || budget <= 0) return null;
+
+  return {
+    budget,
+    monthKey,
+    expenses: normalizeExpenses(data.expenses),
+    history: normalizeHistory(data.history)
+  };
+}
+
+function normalizeExpenses(expenses) {
+  if (!Array.isArray(expenses)) return [];
+  return expenses
+    .map(item => ({
+      id: String(item.id || (crypto.randomUUID ? crypto.randomUUID() : Date.now() + Math.random())),
+      amount: Number(item.amount || 0),
+      description: String(item.description || '').trim() || 'הוצאה בלי שם',
+      date: item.date || toDateInputValue(new Date()),
+      createdAt: Number(item.createdAt || Date.now()),
+      updatedAt: item.updatedAt ? Number(item.updatedAt) : undefined
+    }))
+    .filter(item => item.amount > 0);
+}
+
+function normalizeHistory(history) {
+  if (!Array.isArray(history)) return [];
+  return history
+    .map(item => {
+      const monthKey = typeof item.monthKey === 'string' && /^\d{4}-\d{2}$/.test(item.monthKey)
+        ? item.monthKey
+        : null;
+      if (!monthKey) return null;
+      const expenses = normalizeExpenses(item.expenses);
+      const budget = Number(item.budget || state?.budget || 700);
+      const total = expenses.length ? getTotal(expenses) : Number(item.total || 0);
+      return {
+        id: String(item.id || `archive-${monthKey}`),
+        monthKey,
+        monthLabel: item.monthLabel || formatMonthKey(monthKey),
+        budget,
+        total,
+        expenses
+      };
+    })
+    .filter(Boolean);
 }
 
 function updateOverBudgetWarning() {

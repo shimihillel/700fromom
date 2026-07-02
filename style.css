@@ -21,9 +21,14 @@
 
 * { box-sizing: border-box; }
 html { min-height: 100%; background: var(--bg); }
+
+/* Keeps dynamic hidden elements actually hidden, even when component classes define display:grid/flex. */
+[hidden] { display: none !important; }
+
 body {
   margin: 0;
   min-height: 100dvh;
+  -webkit-text-size-adjust: 100%;
   direction: rtl;
   color: var(--text);
   background:
@@ -275,7 +280,7 @@ h1 {
   z-index: 50;
   display: grid;
   place-items: end center;
-  padding: 14px;
+  padding: max(12px, env(safe-area-inset-top)) 14px max(14px, env(safe-area-inset-bottom));
   background: rgba(0,0,0,.55);
   backdrop-filter: blur(12px);
 }
@@ -286,16 +291,24 @@ h1 {
   border-radius: 32px;
   background: var(--cream);
   color: #111816;
-  padding: 10px 18px 20px;
+  max-height: calc(100dvh - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 10px 22px 24px;
   box-shadow: var(--shadow);
   animation: sheetIn .22s ease;
 }
+.bottom-sheet .primary-btn {
+  margin-top: 8px;
+}
+.bottom-sheet::-webkit-scrollbar { width: 0; height: 0; }
 .bottom-sheet.small { max-width: 460px; }
+.bottom-sheet.small .primary-btn { margin-top: 4px; }
 @keyframes sheetIn { from { transform: translateY(24px); opacity: .5; } to { transform: translateY(0); opacity: 1; } }
 .sheet-handle {
   width: 48px;
   height: 5px;
-  margin: 4px auto 14px;
+  margin: 4px auto 16px;
   border-radius: 999px;
   background: rgba(17,24,22,.18);
 }
@@ -303,20 +316,21 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 10px;
+  margin-bottom: 16px;
 }
 .sheet-head h2 { margin: 0; }
 label {
   display: grid;
-  gap: 8px;
-  margin: 14px 0;
+  gap: 7px;
+  margin: 12px 0;
   font-weight: 800;
 }
 input {
   width: 100%;
   border: 1px solid rgba(17,24,22,.12);
   border-radius: 18px;
-  padding: 16px;
+  min-height: 54px;
+  padding: 14px 16px;
   color: #111816;
   background: rgba(255,255,255,.55);
   outline: none;
@@ -327,8 +341,8 @@ input:focus {
 }
 .warning-box {
   display: grid;
-  gap: 3px;
-  margin: 12px 0;
+  gap: 4px;
+  margin: 10px 0 12px;
   border: 1px solid rgba(214,109,87,.28);
   border-radius: 18px;
   padding: 13px 14px;
@@ -358,6 +372,25 @@ input:focus {
   font-weight: 800;
 }
 .secondary-btn { background: #e8ded0; color: #111816; }
+.secondary-btn.full { width: 100%; }
+.settings-divider {
+  height: 1px;
+  margin: 18px 0 16px;
+  background: rgba(17,24,22,.1);
+}
+.backup-section h3 {
+  margin: 0 0 8px;
+  font-size: 1.05rem;
+}
+.backup-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 12px;
+}
+@media (max-width: 420px) {
+  .backup-actions { grid-template-columns: 1fr; }
+}
 .danger-btn { background: var(--danger); color: white; }
 
 .history-month { overflow: hidden; }
@@ -412,4 +445,17 @@ input:focus {
   .hero-stats { grid-template-columns: 1fr; }
   .expense-card { align-items: flex-start; }
   .expense-actions { flex-direction: column; }
+}
+
+
+@media (max-height: 740px) {
+  .bottom-sheet {
+    border-radius: 28px;
+    padding: 8px 20px 20px;
+  }
+  .sheet-handle { margin-bottom: 12px; }
+  .sheet-head { margin-bottom: 12px; }
+  label { margin: 10px 0; }
+  input { min-height: 50px; padding-block: 12px; }
+  .warning-box { padding: 11px 13px; }
 }

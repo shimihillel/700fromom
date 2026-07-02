@@ -100,6 +100,17 @@
       <label>תקציב חודשי<input id="settingsBudget" inputmode="decimal" type="number" min="1" step="1" required /></label>
       <p class="helper-text">ברירת המחדל היא 700 ₪, אבל החיים קורים.</p>
       <button class="primary-btn" type="submit">עדכני תקציב</button>
+
+      <div class="settings-divider"></div>
+      <section class="backup-section" aria-label="גיבוי ושחזור">
+        <h3>גיבוי ושחזור</h3>
+        <p class="helper-text">שומרת קובץ קטן עם התקציב, ההוצאות וההיסטוריה. הכי “לא לסמוך על המזל”.</p>
+        <div class="backup-actions">
+          <button class="secondary-btn full" id="backupBtn" type="button">גבי נתונים</button>
+          <button class="secondary-btn full" id="restoreBtn" type="button">שחזרי מגיבוי</button>
+        </div>
+        <input id="restoreFile" type="file" accept="application/json,.json" hidden />
+      </section>
     </form>
   </div>
 
