@@ -158,12 +158,25 @@ function render() {
   els.progressCircle.style.strokeDashoffset = `${circumference - (cappedPercent / 100) * circumference}`;
 
   els.budgetMessage.textContent = getBudgetMessage(spent, state.budget, remaining);
-  document.body.classList.toggle('over-budget', spent > state.budget);
+  updateBudgetStateClasses(spent, state.budget);
 
   renderExpenses();
   renderHistory();
   renderStats(spent);
   updateOverBudgetWarning();
+}
+
+function updateBudgetStateClasses(spent, budget) {
+  const percent = budget ? (spent / budget) * 100 : 0;
+  document.body.classList.remove('budget-calm', 'budget-warning', 'budget-over', 'over-budget');
+
+  if (spent > budget) {
+    document.body.classList.add('budget-over', 'over-budget');
+  } else if (percent >= 80) {
+    document.body.classList.add('budget-warning');
+  } else {
+    document.body.classList.add('budget-calm');
+  }
 }
 
 function renderExpenses() {

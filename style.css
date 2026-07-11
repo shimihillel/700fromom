@@ -12,6 +12,15 @@
   --green-dark: #14382f;
   --gold: #d2a456;
   --danger: #d66d57;
+  --state-accent: var(--green);
+  --state-faint: rgba(155,183,133,.22);
+  --state-glow: rgba(155,183,133,.35);
+  --state-soft: rgba(155,183,133,.16);
+  --state-pill: rgba(20,56,47,.18);
+  --button-start: #b6d09a;
+  --button-end: #789466;
+  --button-shadow: rgba(155,183,133,.22);
+  --tab-active-bg: #fff8ec;
   --shadow: 0 24px 60px rgba(0,0,0,.35);
   --radius-xl: 34px;
   --radius-lg: 24px;
@@ -32,9 +41,32 @@ body {
   direction: rtl;
   color: var(--text);
   background:
-    radial-gradient(circle at top left, rgba(155,183,133,.22), transparent 32rem),
-    radial-gradient(circle at 80% 15%, rgba(210,164,86,.12), transparent 22rem),
+    radial-gradient(circle at top left, var(--state-faint), transparent 32rem),
+    radial-gradient(circle at 80% 15%, rgba(210,164,86,.10), transparent 22rem),
     linear-gradient(160deg, #061411, #10251f 48%, #071a17);
+  transition: background .35s ease;
+}
+body.budget-warning {
+  --state-accent: #d2a456;
+  --state-faint: rgba(210,164,86,.20);
+  --state-glow: rgba(210,164,86,.32);
+  --state-soft: rgba(210,164,86,.16);
+  --state-pill: rgba(210,164,86,.13);
+  --button-start: #e7c87c;
+  --button-end: #b8893d;
+  --button-shadow: rgba(210,164,86,.22);
+  --tab-active-bg: #fbefd6;
+}
+body.budget-over {
+  --state-accent: #a5424a;
+  --state-faint: rgba(165,66,74,.18);
+  --state-glow: rgba(165,66,74,.30);
+  --state-soft: rgba(165,66,74,.16);
+  --state-pill: rgba(165,66,74,.14);
+  --button-start: #d9828a;
+  --button-end: #a5424a;
+  --button-shadow: rgba(165,66,74,.24);
+  --tab-active-bg: #f6e2df;
 }
 button, input { font: inherit; }
 button { cursor: pointer; -webkit-tap-highlight-color: transparent; }
@@ -55,7 +87,7 @@ button { cursor: pointer; -webkit-tap-highlight-color: transparent; }
 }
 .eyebrow {
   margin: 0 0 4px;
-  color: var(--green);
+  color: var(--state-accent);
   font-size: .84rem;
   letter-spacing: .04em;
 }
@@ -97,7 +129,8 @@ h1 {
   position: absolute;
   inset: auto -60px -80px -60px;
   height: 170px;
-  background: radial-gradient(circle, rgba(155,183,133,.35), transparent 70%);
+  background: radial-gradient(circle, var(--state-glow), transparent 70%);
+  transition: background .35s ease;
   pointer-events: none;
 }
 .budget-circle {
@@ -120,10 +153,10 @@ h1 {
 }
 .circle-bg { stroke: rgba(255,248,236,.16); }
 .circle-progress {
-  stroke: var(--green);
+  stroke: var(--state-accent);
   transition: stroke-dashoffset .45s ease, stroke .25s ease;
 }
-.over-budget .circle-progress { stroke: var(--danger); }
+/* state colors are controlled by body classes: budget-calm / budget-warning / budget-over */
 .circle-content {
   position: absolute;
   inset: 17%;
@@ -156,7 +189,8 @@ h1 {
   border: 1px solid rgba(255,248,236,.11);
   border-radius: 20px;
   padding: 12px 10px;
-  background: rgba(0,0,0,.16);
+  background: var(--state-pill);
+  transition: background .35s ease, border-color .35s ease;
   text-align: center;
 }
 .stat-pill span {
@@ -173,17 +207,21 @@ h1 {
   min-height: 22px;
   color: var(--cream-2);
   text-align: center;
+  transition: color .35s ease;
 }
+body.budget-warning .budget-message { color: #f0d49c; }
+body.budget-over .budget-message { color: #f1b2b8; }
 .primary-btn {
   width: 100%;
   min-height: 58px;
   border: 0;
   border-radius: 999px;
-  background: linear-gradient(135deg, #b6d09a, #789466);
+  background: linear-gradient(135deg, var(--button-start), var(--button-end));
   color: #061411;
   font-weight: 800;
   font-size: 1.08rem;
-  box-shadow: 0 16px 30px rgba(155,183,133,.22);
+  box-shadow: 0 16px 30px var(--button-shadow);
+  transition: background .35s ease, box-shadow .35s ease;
 }
 
 .tabs {
@@ -206,7 +244,8 @@ h1 {
 }
 .tab.active {
   color: #071a17;
-  background: var(--cream);
+  background: var(--tab-active-bg);
+  transition: background .35s ease;
 }
 .tab-panel { display: none; }
 .tab-panel.active { display: block; }
@@ -408,7 +447,7 @@ input:focus {
 }
 .history-summary span:first-child { display: grid; gap: 4px; }
 .history-summary small { color: var(--muted); }
-.history-total { font-size: 1.2rem; color: var(--green); }
+.history-total { font-size: 1.2rem; color: var(--state-accent); }
 .history-total.bad { color: #ffb2a2; }
 .history-details {
   border-top: 1px solid rgba(255,248,236,.1);
